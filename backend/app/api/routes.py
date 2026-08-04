@@ -185,7 +185,7 @@ async def today(
     serverless её убивают сразу после ответа, и батч не дописался бы
     никогда. Ждать приходится раз в неделю и секунд десять.
     """
-    result = await build_today(session, user, goal)
+    result = await build_today(session, user, goal, settings.generate_ahead_threshold)
     if result.task is not None:
         return result
 
@@ -196,7 +196,29 @@ async def today(
         return result
 
     await session.commit()
-    return await build_today(session, user, goal)
+    return await build_today(session, user, goal, settings.generate_ahead_threshold)
+
+
+@router.post("/goals/{goal_id}/ensure-days", response_model=dict[str, int])
+async def ensure_days(
+    session: SessionDep,
+    client: LLMDep,
+    settings: SettingsDep,
+    user: UserDep,
+    goal: GoalDep,
+) -> dict[str, int]:
+    """Дописать батч заранее. Дёргает фронт фоном, когда до края маршрута
+    осталось меньше порога, и ответа не ждёт.
+
+    Без этого дни писались только в момент, когда человек в них упёрся:
+    порог generate_ahead_threshold существовал, но вызывать ensure_days
+    было некому — и раз в неделю человек стоял минуту перед пустым экраном.
+    """
+    added = await goals_service.ensure_days(
+        session, client, settings, user=user, goal=goal
+    )
+    await session.commit()
+    return {"added": added}
 
 
 @router.post("/tasks/{task_id}/complete", response_model=CompleteDayOut)

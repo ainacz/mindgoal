@@ -77,6 +77,7 @@ export interface Today {
   total_xp: number;
   phase_title: string | null;
   task: DailyTask | null;
+  needs_more_days: boolean;
 }
 
 export interface ClarifyQuestion {

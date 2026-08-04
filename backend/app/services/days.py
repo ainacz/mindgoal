@@ -54,7 +54,7 @@ async def find_goal_by_task(
 
 
 async def build_today(
-    session: AsyncSession, user: User, goal: Goal
+    session: AsyncSession, user: User, goal: Goal, ahead_threshold: int = 0
 ) -> TodayOut:
     """Экран «Сегодня».
 
@@ -72,6 +72,7 @@ async def build_today(
         total_xp=user.total_xp,
         phase_title=phase.title if phase else None,
         task=DailyTaskOut.model_validate(task) if task else None,
+        needs_more_days=goal.needs_more_days(ahead_threshold),
     )
 
 

@@ -40,6 +40,22 @@ export default function App() {
     }
   }, [goals.data, activeId]);
 
+  // Дописываем маршрут заранее, фоном, пока человек читает сегодняшний день.
+  // Ответа не ждём и ошибку глотаем: если не вышло, дни допишутся в /today,
+  // как раньше. Ключ по generated_until_day, чтобы не звать батч дважды —
+  // повторный вызов не сломает базу (уникальность goal_id+day_number),
+  // но заплатим за него зря.
+  const ahead = today.data?.needs_more_days ? `${activeId}:${today.data.current_day}` : null;
+  useEffect(() => {
+    if (!ahead || !activeId) return;
+    void api
+      .ensureDays(activeId)
+      .then((r) => {
+        if (r.added) void today.reload();
+      })
+      .catch(() => undefined);
+  }, [ahead]);
+
   const authFailed =
     session.error instanceof ApiError && session.error.status === 401;
 

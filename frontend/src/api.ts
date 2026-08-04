@@ -92,6 +92,7 @@ export const api = {
     post<unknown>(`/api/tasks/${taskId}/complete`, { result_note: resultNote }),
   simplifyDay: (taskId: string) =>
     post<DailyTask>(`/api/tasks/${taskId}/simplify`),
+  ensureDays: (id: string) => post<{ added: number }>(`/api/goals/${id}/ensure-days`),
   deleteGoal: (id: string) => req<void>(`/api/goals/${id}`, { method: "DELETE" }),
 
   setChecklistItem: (item: ChecklistItem, is_done: boolean) =>

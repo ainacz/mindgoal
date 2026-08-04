@@ -63,6 +63,11 @@ class TodayOut(ORMModel):
     phase_title: str | None
     task: DailyTaskOut | None
 
+    # До края написанного маршрута осталось меньше порога. Фронт дёргает
+    # /ensure-days фоном, пока человек читает сегодняшнюю задачу, — иначе
+    # батч пишется в тот момент, когда человек уже упёрся, и он ждёт минуту.
+    needs_more_days: bool = False
+
 
 class CompleteDayOut(ORMModel):
     """Что вернуть после завершения дня, чтобы фронт не ходил ещё раз."""
