@@ -27,7 +27,9 @@ export function StepCriteria({ criteria, busy, onChange, onGenerate }: Props) {
             key={index}
             className="flex items-start gap-3 border-b border-line-soft py-3.5 first:border-t first:border-line"
           >
-            <span className="mt-1 h-[13px] w-[13px] flex-none border border-dim" />
+            {/* Точка, а не квадрат: квадрат читается как чекбокс,
+                который просят отметить, а отмечать тут нечего. */}
+            <span className="mt-[9px] h-[3px] w-[3px] flex-none rounded-full bg-muted" />
             <input
               value={text}
               onChange={(event) => onChange(index, event.target.value)}
