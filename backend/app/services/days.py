@@ -8,9 +8,13 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from app.ai.client import LLMClient
+from app.ai.mechanics import simplify_task
 from app.config import Settings
+from app.enums import AiCallKind
 from app.models import DailyTask, Goal, TaskChecklistItem, User
 from app.schemas.task import CompleteDayOut, DailyTaskOut, TodayOut
+from app.services.ai_usage import record_ai_call
 from app.services.goals import complete_goal_if_finished
 from app.services.streak import local_today, next_streak
 
@@ -87,6 +91,63 @@ async def toggle_checklist_item(
     item.is_done = is_done
     await session.flush()
     return item
+
+
+async def simplify_day(
+    session: AsyncSession,
+    client: LLMClient,
+    settings: Settings,
+    *,
+    user: User,
+    goal: Goal,
+    task: DailyTask,
+) -> DailyTask:
+    """«Мало времени»: переписать день под пятнадцать минут с телефона.
+
+    Задача перезаписывается на месте, старая версия не хранится: человек
+    нажал это, потому что сегодня не сможет сделать исходную, и вернуть
+    её ему всё равно некуда. Флаг is_simplified не даёт нажать дважды.
+    """
+    if task.is_completed:
+        raise DayError("День уже закрыт")
+    if task.is_simplified:
+        raise DayError("День уже упрощён")
+
+    result = await simplify_task(
+        client,
+        settings,
+        goal_title=goal.title,
+        day_number=task.day_number,
+        task_title=task.title,
+        task_description=task.description,
+    )
+    day = result.data
+
+    task.title = day.title
+    task.estimated_minutes = day.estimated_minutes
+    task.description = day.description
+    task.hint = day.hint
+    task.is_simplified = True
+
+    # Чек-лист меняется целиком: пункты старой задачи к новой не относятся.
+    for item in list(task.checklist):
+        await session.delete(item)
+    task.checklist = [
+        TaskChecklistItem(text=text, order_index=index)
+        for index, text in enumerate(day.checklist)
+    ]
+    await session.flush()
+
+    await record_ai_call(
+        session,
+        user_id=user.id,
+        goal_id=goal.id,
+        kind=AiCallKind.simplify,
+        model=result.model,
+        usage=result.usage,
+        latency_ms=result.latency_ms,
+    )
+    return task
 
 
 async def complete_day(

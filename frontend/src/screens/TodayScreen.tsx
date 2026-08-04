@@ -12,9 +12,9 @@ interface Props {
   onToggleChecklistItem: (item: ChecklistItem, next: boolean) => void;
   onCompleteDay: (resultNote: string | null) => void;
   onSimplify: () => void;
-  onMentor: () => void;
   onRetryGeneration: () => void;
   completing?: boolean;
+  simplifying?: boolean;
 }
 
 /**
@@ -32,9 +32,9 @@ export function TodayScreen({
   onToggleChecklistItem,
   onCompleteDay,
   onSimplify,
-  onMentor,
   onRetryGeneration,
   completing = false,
+  simplifying = false,
 }: Props) {
   const { task } = today;
   const [note, setNote] = useState("");
@@ -106,30 +106,24 @@ export function TodayScreen({
               Завершить день
             </button>
 
-            {/* Текстовые ссылки, а не кнопки: это выходы из потока,
-                а не второе и третье действие дня. */}
-            <div className="mt-3.5 flex justify-center gap-7">
-              <button
-                type="button"
-                onClick={() => {
-                  haptic.tap();
-                  onSimplify();
-                }}
-                className="py-1 text-[12.5px] text-muted"
-              >
-                Мало времени
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  haptic.tap();
-                  onMentor();
-                }}
-                className="py-1 text-[12.5px] text-muted"
-              >
-                Ментор
-              </button>
-            </div>
+            {/* Текстовая ссылка, а не кнопка: это выход из потока,
+                а не второе действие дня. Показываем один раз — упрощённый
+                день упростить ещё раз нельзя, и бэкенд это подтвердит 409-й. */}
+            {!task.is_simplified && (
+              <div className="mt-3.5 flex justify-center">
+                <button
+                  type="button"
+                  disabled={simplifying}
+                  onClick={() => {
+                    haptic.tap();
+                    onSimplify();
+                  }}
+                  className="py-1 text-[12.5px] text-muted disabled:opacity-50"
+                >
+                  {simplifying ? "Переписываю день…" : "Мало времени"}
+                </button>
+              </div>
+            )}
           </div>
         </>
       ) : (

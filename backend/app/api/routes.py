@@ -26,6 +26,7 @@ from app.schemas.task import (
     ChecklistItemUpdate,
     CompleteDayOut,
     CompleteDayRequest,
+    DailyTaskOut,
     TodayOut,
 )
 from app.schemas.user import SessionRequest, UserOut
@@ -35,6 +36,7 @@ from app.services.days import (
     build_today,
     complete_day,
     find_goal_by_task,
+    simplify_day,
     toggle_checklist_item,
 )
 
@@ -224,6 +226,33 @@ async def complete(
 
     await session.commit()
     return result
+
+
+@router.post("/tasks/{task_id}/simplify", response_model=DailyTaskOut)
+async def simplify(
+    task_id: uuid.UUID,
+    session: SessionDep,
+    client: LLMDep,
+    settings: SettingsDep,
+    user: UserDep,
+) -> DailyTaskOut:
+    """«Мало времени». Синхронно, как и вся генерация: человек ждёт
+    на экране, а фоновые задачи на serverless умирают вместе с ответом."""
+    found = await find_goal_by_task(session, user, task_id)
+    if found is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Задача не найдена")
+    goal, task = found
+
+    try:
+        task = await simplify_day(
+            session, client, settings, user=user, goal=goal, task=task
+        )
+    except DayError as exc:
+        await session.rollback()
+        raise HTTPException(status.HTTP_409_CONFLICT, str(exc)) from exc
+
+    await session.commit()
+    return DailyTaskOut.model_validate(task)
 
 
 @router.patch("/checklist/{item_id}", response_model=ChecklistItemOut)

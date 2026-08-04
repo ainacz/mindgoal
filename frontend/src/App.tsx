@@ -18,6 +18,7 @@ export default function App() {
   const [wizardOpen, setWizardOpen] = useState(false);
   const [openedDay, setOpenedDay] = useState<DailyTask | null>(null);
   const [completing, setCompleting] = useState(false);
+  const [simplifying, setSimplifying] = useState(false);
 
   useEffect(initTelegram, []);
 
@@ -84,6 +85,18 @@ export default function App() {
     }
   }
 
+  async function simplifyDay() {
+    const task = today.data?.task;
+    if (!task || simplifying) return;
+    setSimplifying(true);
+    try {
+      await api.simplifyDay(task.id);
+      await today.reload();
+    } finally {
+      setSimplifying(false);
+    }
+  }
+
   const todayTitleByGoal = Object.fromEntries(
     (goals.data ?? []).map((item) => [
       item.id,
@@ -103,8 +116,8 @@ export default function App() {
             completing={completing}
             onToggleChecklistItem={(item, next) => void toggleChecklistItem(item, next)}
             onCompleteDay={(note) => void completeDay(note)}
-            onSimplify={() => undefined}
-            onMentor={() => undefined}
+            onSimplify={() => void simplifyDay()}
+            simplifying={simplifying}
             onRetryGeneration={() => void today.reload()}
           />
         ) : (

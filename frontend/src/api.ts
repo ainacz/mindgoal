@@ -11,6 +11,7 @@ import type {
   ChecklistItem,
   ClarifyQuestion,
   Criterion,
+  DailyTask,
   Goal,
   GoalDetail,
   Today,
@@ -89,6 +90,8 @@ export const api = {
     post<Goal>(`/api/goals/${id}/generate`, { answers }),
   completeDay: (taskId: string, resultNote: string | null) =>
     post<unknown>(`/api/tasks/${taskId}/complete`, { result_note: resultNote }),
+  simplifyDay: (taskId: string) =>
+    post<DailyTask>(`/api/tasks/${taskId}/simplify`),
   deleteGoal: (id: string) => req<void>(`/api/goals/${id}`, { method: "DELETE" }),
 
   setChecklistItem: (item: ChecklistItem, is_done: boolean) =>
