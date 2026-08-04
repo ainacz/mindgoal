@@ -6,10 +6,9 @@
 import logging
 import uuid
 
-from fastapi import APIRouter, BackgroundTasks, HTTPException, status
+from fastapi import APIRouter, HTTPException, status
 
 from app.api.deps import GoalDep, LLMDep, SessionDep, SettingsDep, UserDep
-from app.db import SessionFactory
 from app.enums import GoalStatus
 from app.schemas.goal import (
     ClarifyRequest,
@@ -165,43 +164,33 @@ async def delete_goal(session: SessionDep, goal: GoalDep) -> None:
 # --------------------------------------------------------------- день
 
 
-async def _write_next_batch(goal_id: uuid.UUID, user_id: int) -> None:
-    """Фоновая догенерация.
-
-    Своя сессия: фон запускается после ответа, к этому моменту сессия
-    запроса уже закрыта. Ошибку глотаем намеренно — человек её не ждёт,
-    у него есть открытые дни, а попытка повторится при следующем заходе.
-    """
-    from app.ai import get_llm_client
-    from app.config import get_settings
-    from app.models import Goal, User
-
-    settings = get_settings()
-    async with SessionFactory() as session:
-        try:
-            user = await session.get(User, user_id)
-            goal = await goals_service.get_goal(session, user, goal_id) if user else None
-            if goal is None:
-                return
-            added = await goals_service.ensure_days(
-                session, get_llm_client(), settings, user=user, goal=goal
-            )
-            if added:
-                await session.commit()
-        except Exception:
-            await session.rollback()
-            logger.warning("Батч для цели %s не дописался", goal_id, exc_info=True)
-
-
 @router.get("/goals/{goal_id}/today", response_model=TodayOut)
 async def today(
-    session: SessionDep, user: UserDep, goal: GoalDep, background: BackgroundTasks
+    session: SessionDep,
+    client: LLMDep,
+    settings: SettingsDep,
+    user: UserDep,
+    goal: GoalDep,
 ) -> TodayOut:
-    """Проверка «нужен ли батч» висит здесь, а не только на завершении дня:
-    так недописанный батч сам чинится при следующем заходе."""
+    """Экран «Сегодня».
+
+    Если человек упёрся в край написанного маршрута — дописываем прямо
+    здесь и отдаём готовый день. Фоновой задачи нет намеренно: на
+    serverless её убивают сразу после ответа, и батч не дописался бы
+    никогда. Ждать приходится раз в неделю и секунд десять.
+    """
     result = await build_today(session, user, goal)
-    background.add_task(_write_next_batch, goal.id, user.id)
-    return result
+    if result.task is not None:
+        return result
+
+    added = await goals_service.ensure_days(
+        session, client, settings, user=user, goal=goal
+    )
+    if not added:
+        return result
+
+    await session.commit()
+    return await build_today(session, user, goal)
 
 
 @router.post("/tasks/{task_id}/complete", response_model=CompleteDayOut)
@@ -210,7 +199,6 @@ async def complete(
     session: SessionDep,
     settings: SettingsDep,
     user: UserDep,
-    background: BackgroundTasks,
 ) -> CompleteDayOut:
     found = await find_goal_by_task(session, user, task_id)
     if found is None:
@@ -225,7 +213,6 @@ async def complete(
         raise HTTPException(status.HTTP_409_CONFLICT, str(exc)) from exc
 
     await session.commit()
-    background.add_task(_write_next_batch, goal.id, user.id)
     return result
 
 
