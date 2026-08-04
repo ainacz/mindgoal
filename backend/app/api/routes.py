@@ -19,6 +19,7 @@ from app.schemas.goal import (
     GoalDetail,
     GoalDraftOut,
     GoalListItem,
+    GenerateRequest,
 )
 from app.schemas.task import (
     ChecklistItemOut,
@@ -110,6 +111,7 @@ async def update_criteria(
 
 @router.post("/goals/{goal_id}/generate", response_model=GoalListItem)
 async def generate_route(
+    payload: GenerateRequest,
     session: SessionDep,
     client: LLMDep,
     settings: SettingsDep,
@@ -124,7 +126,7 @@ async def generate_route(
     """
     try:
         await goals_service.generate_skeleton(
-            session, client, settings, user=user, goal=goal
+            session, client, settings, user=user, goal=goal, answers=payload.answers
         )
     except goals_service.GoalError as exc:
         await session.rollback()

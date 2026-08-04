@@ -22,7 +22,10 @@ export interface WizardApi {
     answers: Array<{ question: string; answer: string }>,
   ): Promise<{ goal: Goal; criteria: Criterion[] }>;
   updateCriteria(goalId: string, texts: string[]): Promise<void>;
-  generate(goalId: string): Promise<GoalDetail>;
+  generate(
+    goalId: string,
+    answers: Array<{ question: string; answer: string }>,
+  ): Promise<GoalDetail>;
 }
 
 interface Props {
@@ -116,7 +119,13 @@ export function CreateGoalSheet({ open, api, onClose, onFinished }: Props) {
         goalId,
         criteria.map((text) => text.trim()).filter(Boolean),
       );
-      const detail = await api.generate(goalId);
+      const detail = await api.generate(
+        goalId,
+        questions.map((item) => ({
+          question: item.question,
+          answer: answers[item.question] ?? "",
+        })),
+      );
       setReady(detail);
       haptic.success();
       setStage("ready");

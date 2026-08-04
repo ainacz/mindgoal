@@ -58,6 +58,16 @@ class GoalCreate(BaseModel):
     _v = field_validator("duration_days")(_check_duration)
 
 
+class GenerateRequest(BaseModel):
+    """Ответы про точку старта переезжают с шага уточнения сюда.
+
+    В базе они не хранятся: нужны ровно один раз, при сборке скелета.
+    Понадобятся ментору — тогда и заведём колонку.
+    """
+
+    answers: list[ClarifyAnswer] = Field(default_factory=list, max_length=5)
+
+
 class CriterionOut(ORMModel):
     id: uuid.UUID
     text: str

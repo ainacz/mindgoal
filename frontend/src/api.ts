@@ -83,7 +83,10 @@ export const api = {
       body: JSON.stringify({ texts }),
     }),
 
-  generate: (id: string) => post<Goal>(`/api/goals/${id}/generate`),
+  // Ответы про точку старта нужны генератору маршрута, а не только
+  // критериям — иначе дни одинаковые у новичка и у продолжающего.
+  generate: (id: string, answers: Array<{ question: string; answer: string }>) =>
+    post<Goal>(`/api/goals/${id}/generate`, { answers }),
   completeDay: (taskId: string) => post<unknown>(`/api/tasks/${taskId}/complete`),
   deleteGoal: (id: string) => req<void>(`/api/goals/${id}`, { method: "DELETE" }),
 

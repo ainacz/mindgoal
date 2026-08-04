@@ -150,6 +150,7 @@ async def generate_skeleton(
     *,
     user: User,
     goal: Goal,
+    answers: list[ClarifyAnswer] | None = None,
 ) -> Goal:
     """Фазы на весь срок и первая неделя дней.
 
@@ -169,7 +170,9 @@ async def generate_skeleton(
         title=goal.title,
         duration_days=goal.duration_days,
         criteria=[c.text for c in goal.criteria],
-        answers=[],
+        # Точка старта человека. Без неё маршрут для того, кто бегает
+        # пять километров, и для того, кто не бегает вовсе, одинаковый.
+        answers=_answers(answers or []),
     )
 
     goal.phases = [

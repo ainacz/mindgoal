@@ -29,21 +29,23 @@ def _day(n: int, minutes: int = 30) -> dict:
 # --------------------------------------------------------------- уточнение
 
 
-def test_clarify_skips_when_goal_is_concrete():
+def test_clarify_always_asks_about_starting_point():
+    """Вопросы задаются даже для конкретной цели: без точки старта
+    маршрут одинаков у новичка и у продолжающего."""
     result = AIClarifyResult.model_validate(
-        {"needs_clarification": False, "questions": []}
+        {"questions": [{"question": "Какой уровень сейчас?", "options": ["Ноль", "Средний"]}]}
     )
-    assert result.questions == []
+    assert len(result.questions) == 1
 
 
-def test_clarify_rejects_flag_without_questions():
+def test_clarify_rejects_empty_questions():
     with pytest.raises(ValidationError):
-        AIClarifyResult.model_validate(
-            {"needs_clarification": True, "questions": []}
-        )
+        AIClarifyResult.model_validate({"questions": []})
 
 
-def test_clarify_rejects_questions_without_flag():
+def test_clarify_rejects_leftover_field():
+    """Модель иногда цепляется за старую форму ответа — ловим это здесь,
+    а не в проде."""
     with pytest.raises(ValidationError):
         AIClarifyResult.model_validate(
             {

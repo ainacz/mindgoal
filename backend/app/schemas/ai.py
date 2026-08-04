@@ -19,18 +19,14 @@ class AIClarifyQuestion(StrictModel):
 
 
 class AIClarifyResult(StrictModel):
-    """Пустой список — цель конкретная, уточнять нечего."""
+    """Вопросы задаются всегда: без точки старта маршрут не построить.
 
-    needs_clarification: bool
-    questions: list[AIClarifyQuestion] = Field(default_factory=list, max_length=3)
+    Раньше здесь был флаг «цель конкретная, уточнять нечего» — и на
+    «пробежать марафон» мы не спрашивали ничего, а потом строили дни
+    для человека, про которого не знали, бегает он сейчас или нет.
+    """
 
-    @model_validator(mode="after")
-    def _consistent(self) -> "AIClarifyResult":
-        if self.needs_clarification and not self.questions:
-            raise ValueError("needs_clarification=true, но вопросов нет")
-        if not self.needs_clarification and self.questions:
-            raise ValueError("needs_clarification=false, но вопросы пришли")
-        return self
+    questions: list[AIClarifyQuestion] = Field(min_length=1, max_length=3)
 
 
 # --------------------------------------------------------------- критерии

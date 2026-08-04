@@ -22,6 +22,7 @@ from app.schemas.goal import (
     GoalDetail,
     GoalDraftOut,
     GoalListItem,
+    GenerateRequest,
     PhaseOut,
 )
 from app.schemas.task import (
@@ -54,6 +55,7 @@ __all__ = [
     "DailyTaskOut",
     "GoalCreate",
     "GoalDetail",
+    "GenerateRequest",
     "GoalDraftOut",
     "GoalListItem",
     "PhaseOut",

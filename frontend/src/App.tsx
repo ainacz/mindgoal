@@ -156,8 +156,8 @@ export default function App() {
           updateCriteria: async (id, texts) => {
             await api.updateCriteria(id, texts);
           },
-          generate: async (id) => {
-            await api.generate(id);
+          generate: async (id, answers) => {
+            await api.generate(id, answers);
             return api.goal(id);
           },
         }}

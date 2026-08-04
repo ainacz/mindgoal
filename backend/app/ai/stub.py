@@ -22,10 +22,6 @@ from app.ai.prompts import (
 )
 from app.schemas.ai import TokenUsage
 
-# Цели с этими словами заглушка считает размытыми — чтобы шаг уточнения
-# тоже можно было потрогать, а не только пропустить.
-VAGUE_MARKERS = ("бизнес", "язык", "работ", "лучше", "зарабат", "спорт", "форм")
-
 _ACTIONS = (
     "Разобрать один пример и повторить его руками",
     "Написать короткий скрипт и запустить его",
@@ -106,15 +102,11 @@ class StubLLMClient:
     # ------------------------------------------------------------------
 
     def _clarify(self, payload: dict) -> Completion:
-        goal = str(payload.get("goal", "")).lower()
-        if not any(marker in goal for marker in VAGUE_MARKERS):
-            return _wrap({"needs_clarification": False, "questions": []})
         return _wrap(
             {
-                "needs_clarification": True,
                 "questions": [
                     {
-                        "question": "С чего начинаешь?",
+                        "question": "Какой у тебя сейчас уровень?",
                         "options": ["С нуля", "Кое-что есть", "Уже делаю"],
                     },
                     {

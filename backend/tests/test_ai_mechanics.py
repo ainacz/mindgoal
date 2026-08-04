@@ -48,14 +48,14 @@ SKELETON_OK = {
 # --------------------------------------------------------------- уточнение
 
 
-def test_clarify_concrete_goal_asks_nothing():
+def test_clarify_asks_about_starting_point():
     fake = FakeLLMClient(
-        [FakeLLMClient.json_response({"needs_clarification": False, "questions": []})]
+        [FakeLLMClient.json_response({"questions": [{"question": "Какой уровень сейчас?", "options": ["Ноль", "Средний"]}]})]
     )
     result = asyncio.run(
         clarify_goal(fake, settings(), title="Стать AI-инженером", duration_days=90)
     )
-    assert result.data.questions == []
+    assert len(result.data.questions) == 1
     assert result.attempts == 1
     assert fake.system_prompts == [SYSTEM_CLARIFY]
 
@@ -65,7 +65,6 @@ def test_clarify_vague_goal_returns_questions():
         [
             FakeLLMClient.json_response(
                 {
-                    "needs_clarification": True,
                     "questions": [
                         {"question": "Какой у тебя уровень?", "options": ["Ноль", "Средний"]},
                         {"question": "Сколько минут в день?", "options": ["15", "30", "60"]},
@@ -147,7 +146,7 @@ def test_retry_keeps_system_prompt_identical():
     """
     bad = "не json вовсе"
     good = FakeLLMClient.json_response(
-        {"needs_clarification": False, "questions": []}
+        {"questions": [{"question": "Какой уровень сейчас?", "options": ["Ноль", "Средний"]}]}
     )
     fake = FakeLLMClient([bad, good])
     asyncio.run(clarify_goal(fake, settings(), title="Купить BMW", duration_days=30))
@@ -265,10 +264,7 @@ def test_stub_passes_the_same_contracts():
     clar = asyncio.run(
         clarify_goal(stub, cfg, title="Стать AI-инженером", duration_days=90)
     )
-    assert clar.data.questions == []
-
-    vague = asyncio.run(clarify_goal(stub, cfg, title="Хочу бизнес", duration_days=60))
-    assert len(vague.data.questions) == 3
+    assert len(clar.data.questions) == 3
 
     crit = asyncio.run(
         make_criteria(stub, cfg, title="Хочу бизнес", duration_days=60, answers=[])
