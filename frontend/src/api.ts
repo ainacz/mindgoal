@@ -71,7 +71,7 @@ export const api = {
     duration_days: number,
     answers: Array<{ question: string; answer: string }>,
   ) =>
-    post<{ goal: Goal; criteria: Criterion[] }>("/api/goals", {
+    post<{ goal: Goal; criteria: Criterion[]; reality_note: string | null }>("/api/goals", {
       title,
       duration_days,
       answers,
@@ -87,7 +87,8 @@ export const api = {
   // критериям — иначе дни одинаковые у новичка и у продолжающего.
   generate: (id: string, answers: Array<{ question: string; answer: string }>) =>
     post<Goal>(`/api/goals/${id}/generate`, { answers }),
-  completeDay: (taskId: string) => post<unknown>(`/api/tasks/${taskId}/complete`),
+  completeDay: (taskId: string, resultNote: string | null) =>
+    post<unknown>(`/api/tasks/${taskId}/complete`, { result_note: resultNote }),
   deleteGoal: (id: string) => req<void>(`/api/goals/${id}`, { method: "DELETE" }),
 
   setChecklistItem: (item: ChecklistItem, is_done: boolean) =>

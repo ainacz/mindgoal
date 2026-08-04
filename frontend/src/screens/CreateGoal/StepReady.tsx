@@ -1,5 +1,4 @@
 import type { GoalDetail } from "@/types";
-import { Graduation } from "@/components/Graduation";
 
 interface Props {
   goal: GoalDetail;
@@ -17,17 +16,7 @@ export function StepReady({ goal, onStart }: Props) {
 
   return (
     <>
-      <div className="mt-5">
-        <Graduation
-          total={goal.duration_days}
-          current={1}
-          phaseStarts={goal.phases.map((phase) => phase.start_day)}
-          height={30}
-          showCaret
-        />
-      </div>
-
-      <ul className="mt-5">
+      <ul className="mt-6">
         {goal.phases.map((phase) => (
           <li
             key={phase.id}

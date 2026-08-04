@@ -20,7 +20,7 @@ export interface WizardApi {
     title: string,
     durationDays: number,
     answers: Array<{ question: string; answer: string }>,
-  ): Promise<{ goal: Goal; criteria: Criterion[] }>;
+  ): Promise<{ goal: Goal; criteria: Criterion[]; reality_note: string | null }>;
   updateCriteria(goalId: string, texts: string[]): Promise<void>;
   generate(
     goalId: string,
@@ -49,6 +49,7 @@ export function CreateGoalSheet({ open, api, onClose, onFinished }: Props) {
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [goalId, setGoalId] = useState<string | null>(null);
   const [criteria, setCriteria] = useState<string[]>([]);
+  const [realityNote, setRealityNote] = useState<string | null>(null);
   const [ready, setReady] = useState<GoalDetail | null>(null);
 
   /** Шагов всего два, если цель уже конкретная: уточнение пропускается. */
@@ -67,6 +68,7 @@ export function CreateGoalSheet({ open, api, onClose, onFinished }: Props) {
     setAnswers({});
     setGoalId(null);
     setCriteria([]);
+    setRealityNote(null);
     setReady(null);
   }
 
@@ -78,6 +80,7 @@ export function CreateGoalSheet({ open, api, onClose, onFinished }: Props) {
       const created = await api.create(title.trim(), duration, withAnswers);
       setGoalId(created.goal.id);
       setCriteria(created.criteria.map((item) => item.text));
+      setRealityNote(created.reality_note);
       setStage("criteria");
     } catch (err) {
       setError(
@@ -195,6 +198,7 @@ export function CreateGoalSheet({ open, api, onClose, onFinished }: Props) {
       {stage === "criteria" && (
         <StepCriteria
           criteria={criteria}
+          realityNote={realityNote}
           busy={busy}
           onChange={(index, value) =>
             setCriteria((previous) =>

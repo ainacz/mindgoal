@@ -72,12 +72,12 @@ export default function App() {
     await api.setChecklistItem(item, next).catch(undo);
   }
 
-  async function completeDay() {
+  async function completeDay(resultNote: string | null) {
     const task = today.data?.task;
     if (!task || completing) return;
     setCompleting(true);
     try {
-      await api.completeDay(task.id);
+      await api.completeDay(task.id, resultNote);
       await Promise.all([today.reload(), goal.reload(), goals.reload()]);
     } finally {
       setCompleting(false);
@@ -97,13 +97,12 @@ export default function App() {
     // на коротких экранах вроде «Карты».
     <div className="relative mx-auto flex h-[100dvh] max-w-[430px] flex-col overflow-hidden bg-ink">
       {tab === "today" &&
-        (today.data && goal.data ? (
+        (today.data ? (
           <TodayScreen
             today={today.data}
-            phaseStarts={goal.data.phases.map((phase) => phase.start_day)}
             completing={completing}
             onToggleChecklistItem={(item, next) => void toggleChecklistItem(item, next)}
-            onCompleteDay={() => void completeDay()}
+            onCompleteDay={(note) => void completeDay(note)}
             onSimplify={() => undefined}
             onMentor={() => undefined}
             onRetryGeneration={() => void today.reload()}
@@ -187,6 +186,11 @@ export default function App() {
             <p className="mt-3 text-[13.5px] leading-relaxed text-muted">
               {openedDay.description}
             </p>
+            {openedDay.result_note && (
+              <p className="mt-4 text-[13.5px] leading-relaxed text-bone">
+                <span className="text-muted">Вышло:</span> {openedDay.result_note}
+              </p>
+            )}
             <ul className="mt-5 border-t border-line-soft">
               {openedDay.checklist.map((entry) => (
                 <li

@@ -24,6 +24,7 @@ export interface DailyTask {
   estimated_minutes: number;
   description: string;
   hint: string | null;
+  result_note: string | null;
   is_completed: boolean;
   completed_at: string | null;
   is_simplified: boolean;

@@ -10,61 +10,52 @@ interface Props {
 }
 
 /**
- * Чек-лист без коробок: кружок, текст, волосяная линия снизу.
+ * Чек-лист без коробок, без шапки со счётчиком и без линий между пунктами.
  *
- * Выполненный пункт не зачёркивается, а гаснет. Зачёркивание на четырнадцати
- * пикселях превращается в грязь и читается хуже, чем просто тусклый текст.
+ * Счётчик «2 из 3» повторял то, что и так видно по кружкам, а линии
+ * между тремя строчками добавляли три черты на экран, где их и без того
+ * хватало. Выполненный пункт не зачёркивается, а гаснет: зачёркивание
+ * на четырнадцати пикселях превращается в грязь.
  */
 export function Checklist({ items, onToggle }: Props) {
-  const done = items.filter((item) => item.is_done).length;
-
   return (
-    <section className="mt-6">
-      <header className="flex items-baseline justify-between border-b border-line pb-2 label-dim text-muted">
-        <span>Чек-лист</span>
-        <span>
-          <b className="font-semibold text-bone">{done}</b> / {items.length}
-        </span>
-      </header>
-
-      <ul>
-        {items.map((item) => (
-          <li key={item.id}>
-            <button
-              type="button"
-              onClick={() => {
-                haptic.tap();
-                onToggle(item, !item.is_done);
-              }}
-              aria-pressed={item.is_done}
-              className="flex w-full items-start gap-3 border-b border-line-soft px-0.5 py-3 text-left"
+    <ul>
+      {items.map((item) => (
+        <li key={item.id}>
+          <button
+            type="button"
+            onClick={() => {
+              haptic.tap();
+              onToggle(item, !item.is_done);
+            }}
+            aria-pressed={item.is_done}
+            className="flex w-full items-start gap-3.5 py-2.5 text-left"
+          >
+            <span
+              className={cn(
+                "mt-[3px] grid h-[15px] w-[15px] flex-none place-items-center rounded-full border transition-colors",
+                item.is_done ? "border-bone bg-bone" : "border-dim",
+              )}
             >
-              <span
+              <Check
                 className={cn(
-                  "mt-0.5 grid h-4 w-4 flex-none place-items-center rounded-full border transition-colors",
-                  item.is_done ? "border-bone bg-bone" : "border-dim",
+                  "h-2 w-2 text-ink transition-opacity",
+                  item.is_done ? "opacity-100" : "opacity-0",
                 )}
-              >
-                <Check
-                  className={cn(
-                    "h-2 w-2 text-ink transition-opacity",
-                    item.is_done ? "opacity-100" : "opacity-0",
-                  )}
-                  strokeWidth={4}
-                />
-              </span>
-              <span
-                className={cn(
-                  "text-sm leading-snug transition-colors",
-                  item.is_done ? "text-dim" : "text-bone",
-                )}
-              >
-                {item.text}
-              </span>
-            </button>
-          </li>
-        ))}
-      </ul>
-    </section>
+                strokeWidth={4}
+              />
+            </span>
+            <span
+              className={cn(
+                "text-[14px] leading-snug transition-colors",
+                item.is_done ? "text-dim" : "text-bone",
+              )}
+            >
+              {item.text}
+            </span>
+          </button>
+        </li>
+      ))}
+    </ul>
   );
 }

@@ -2,6 +2,8 @@ import { Pencil } from "lucide-react";
 
 interface Props {
   criteria: string[];
+  /** Не null, когда срок не бьётся с уровнем. */
+  realityNote: string | null;
   busy: boolean;
   onChange: (index: number, value: string) => void;
   onGenerate: () => void;
@@ -11,7 +13,13 @@ interface Props {
  * Критерии готовности. Каждый можно переписать прямо здесь — поэтому это
  * поля ввода, а не текст с кнопкой «редактировать».
  */
-export function StepCriteria({ criteria, busy, onChange, onGenerate }: Props) {
+export function StepCriteria({
+  criteria,
+  realityNote,
+  busy,
+  onChange,
+  onGenerate,
+}: Props) {
   return (
     <>
       <h2 className="mt-6 font-display text-[23px] font-medium leading-snug text-bone">
@@ -20,6 +28,18 @@ export function StepCriteria({ criteria, busy, onChange, onGenerate }: Props) {
       <p className="mt-2.5 text-[13px] leading-relaxed text-muted">
         Только то, что можно предъявить. Не «разобрался», а ссылка, файл, оффер.
       </p>
+
+      {/* Не запрет, а предупреждение: человек вправе взяться
+          за невозможное — но должен узнать об этом сейчас,
+          а не на тридцатый день. */}
+      {realityNote && (
+        <div className="mt-5 border-l border-brass pl-3">
+          <div className="label-dim tracking-label text-brass">Про срок</div>
+          <p className="mt-1.5 text-[13px] leading-relaxed text-muted">
+            {realityNote}
+          </p>
+        </div>
+      )}
 
       <ul className="mt-5">
         {criteria.map((text, index) => (

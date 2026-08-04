@@ -1,7 +1,6 @@
 import { Fragment } from "react";
 
 import type { DailyTask, GoalDetail, Phase } from "@/types";
-import { Graduation } from "@/components/Graduation";
 import { StatusBar } from "@/components/StatusBar";
 import { cn } from "@/lib/cn";
 import { haptic } from "@/lib/telegram";
@@ -39,7 +38,6 @@ function rowsForPhase(phase: Phase, goal: GoalDetail): Row[] {
 }
 
 export function MapScreen({ goal, totalXp, onOpenDay }: Props) {
-  const phaseStarts = goal.phases.map((phase) => phase.start_day);
   const hasLocked = goal.generated_until_day < goal.duration_days;
 
   return (
@@ -50,29 +48,13 @@ export function MapScreen({ goal, totalXp, onOpenDay }: Props) {
         totalXp={totalXp}
       />
 
-      <div className="flex-none px-5 pt-1">
-        <Graduation
-          total={goal.duration_days}
-          current={goal.current_day}
-          phaseStarts={phaseStarts}
-          showCaret
-        />
-        <div className="mt-2 flex items-baseline justify-between label-dim">
-          <span>
-            {goal.phases.length} фазы · {goal.duration_days} делений
-          </span>
-          <span className="tracking-meta text-signal">
-            {goal.current_day} / {goal.duration_days}
-          </span>
-        </div>
-        <div className="mt-3 h-px bg-line-soft" />
-      </div>
-
-      <div className="flex-1 overflow-y-auto px-5">
-        <div className="flex items-baseline justify-between pt-[18px]">
+      {/* Горизонтальной шкалы здесь больше нет: сам список дней и есть
+          шкала, только вертикальная — по строке на деление. */}
+      <div className="flex-1 overflow-y-auto px-[22px]">
+        <div className="flex items-baseline justify-between pt-2">
           <h1 className="font-display text-[19px] font-light text-bone">Маршрут</h1>
-          <span className="label-dim">
-            Открыт до дня {goal.generated_until_day}
+          <span className="text-[12.5px] text-dim">
+            День {goal.current_day} из {goal.duration_days}
           </span>
         </div>
 
@@ -87,7 +69,7 @@ export function MapScreen({ goal, totalXp, onOpenDay }: Props) {
                 <div className="font-display text-[13.5px] font-medium text-bone">
                   {phase.title}
                 </div>
-                <div className="mt-1 label-dim">
+                <div className="mt-1 text-[12px] text-dim">
                   Дни {phase.start_day}—{phase.end_day}
                   {goal.current_day > phase.end_day && " · пройдена"}
                   {goal.current_day >= phase.start_day &&
@@ -161,7 +143,7 @@ export function MapScreen({ goal, totalXp, onOpenDay }: Props) {
           ))}
 
           {hasLocked && (
-            <p className="mb-5 mt-3.5 border-t border-line-soft pt-3 label-dim leading-relaxed">
+            <p className="mb-6 mt-4 text-[12px] leading-relaxed text-dim">
               Дни после {goal.generated_until_day} появятся ближе к делу
             </p>
           )}

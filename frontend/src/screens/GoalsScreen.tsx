@@ -3,7 +3,6 @@ import { Plus, Trash2 } from "lucide-react";
 
 import type { Goal } from "@/types";
 import { Empty } from "@/components/Empty";
-import { Graduation } from "@/components/Graduation";
 import { StatusBar } from "@/components/StatusBar";
 import { cn } from "@/lib/cn";
 import { confirmAction, haptic } from "@/lib/telegram";
@@ -59,10 +58,10 @@ export function GoalsScreen({
           }
         />
       ) : (
-        <div className="flex-1 overflow-y-auto px-5 pt-4">
+        <div className="flex-1 overflow-y-auto px-[22px] pt-3">
           <div className="flex items-baseline justify-between">
             <h1 className="font-display text-[19px] font-light text-bone">Мои цели</h1>
-            <span className="label-dim">
+            <span className="text-[12.5px] text-dim">
               {goals.filter((goal) => goal.status === "active").length} активные
             </span>
           </div>
@@ -96,7 +95,7 @@ export function GoalsScreen({
                   <button
                     type="button"
                     onClick={() => void askAndDelete(goal)}
-                    className="absolute bottom-4 right-0 top-4 flex w-[74px] flex-col items-center justify-center gap-1.5 rounded-[13px] border border-danger/30 bg-danger/10 font-mono text-[8.5px] uppercase tracking-meta text-danger"
+                    className="absolute bottom-4 right-0 top-4 flex w-[74px] flex-col items-center justify-center gap-1.5 rounded-[13px] border border-danger/30 bg-danger/10 text-[11px] text-danger"
                   >
                     <Trash2 className="h-3.5 w-3.5" strokeWidth={1.5} />
                     Удалить
@@ -114,9 +113,7 @@ export function GoalsScreen({
                   )}
                 >
                   {goal.category && (
-                    <div className="font-mono text-[9px] uppercase tracking-label text-muted">
-                      {goal.category}
-                    </div>
+                    <div className="text-[12px] text-muted">{goal.category}</div>
                   )}
                   <h2 className="mt-2.5 font-display text-[21px] font-light leading-tight text-bone">
                     {goal.title}
@@ -129,15 +126,20 @@ export function GoalsScreen({
                     </p>
                   )}
 
-                  <div className="mt-3.5">
-                    <Graduation
-                      total={goal.duration_days}
-                      current={goal.current_day}
-                      height={10}
+                  {/* Полоска, а не девяносто делений: в карточке нужен
+                      только ответ «далеко ли», а не показание. */}
+                  <div className="mt-4 h-[2px] w-full rounded-sm bg-line">
+                    <div
+                      className="h-full rounded-sm bg-bone opacity-60"
+                      style={{
+                        width: `${Math.round(
+                          (goal.current_day / goal.duration_days) * 100,
+                        )}%`,
+                      }}
                     />
                   </div>
 
-                  <div className="mt-2.5 flex justify-between label-dim">
+                  <div className="mt-2.5 flex justify-between text-[12px] text-dim">
                     <span>
                       {isArchived
                         ? `${goal.duration_days} из ${goal.duration_days} · завершена`
@@ -157,7 +159,7 @@ export function GoalsScreen({
           <button
             type="button"
             onClick={onCreateGoal}
-            className="mb-2 mt-5 flex h-12 w-full items-center justify-center gap-2.5 rounded-[13px] border border-dashed border-line font-mono text-[10px] uppercase tracking-label text-muted transition-colors active:border-muted active:text-bone"
+            className="mb-2 mt-6 flex h-12 w-full items-center justify-center gap-2.5 rounded-[13px] border border-dashed border-line text-[13.5px] text-muted transition-colors active:border-muted active:text-bone"
           >
             <Plus className="h-3 w-3" strokeWidth={1.6} />
             Новая цель

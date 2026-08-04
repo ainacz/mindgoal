@@ -3,16 +3,16 @@ interface Props {
 }
 
 /**
- * Подсказка держится на волосяной линии слева, а не на цветной плашке.
+ * Подсказка — обычный абзац с жирным началом.
  *
- * Бирюзовый здесь был бы вторым акцентом на экране, где он уже потрачен
- * на текущий день. Подсказке и положено быть тихой.
+ * Была вертикальная черта плюс метка капсом с трекингом: две лишние
+ * детали ради одного предложения, которое и так читается как подсказка,
+ * если начать его словом «Подсказка».
  */
 export function Hint({ text }: Props) {
   return (
-    <aside className="my-5 border-l border-dim pl-3">
-      <div className="label-dim text-muted">Подсказка</div>
-      <p className="mt-1.5 text-[13px] leading-relaxed text-muted">{text}</p>
-    </aside>
+    <p className="mb-6 mt-6 text-[13px] leading-relaxed text-dim">
+      <b className="font-medium text-muted">Подсказка.</b> {text}
+    </p>
   );
 }
