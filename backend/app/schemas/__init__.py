@@ -1,0 +1,64 @@
+"""Реэкспорт схем. Из них же генерируются типы для фронта."""
+
+from app.schemas.ai import (
+    AIClarifyQuestion,
+    AIClarifyResult,
+    AICriteriaResult,
+    AIDay,
+    AIDayBatch,
+    AIPhase,
+    AIRouteSkeleton,
+    AISimplifiedTask,
+    TokenUsage,
+)
+from app.schemas.goal import (
+    ClarifyAnswer,
+    ClarifyQuestion,
+    ClarifyRequest,
+    ClarifyResponse,
+    CriteriaUpdate,
+    CriterionOut,
+    GoalCreate,
+    GoalDetail,
+    GoalDraftOut,
+    GoalListItem,
+    PhaseOut,
+)
+from app.schemas.task import (
+    ChecklistItemOut,
+    ChecklistItemUpdate,
+    CompleteDayOut,
+    DailyTaskOut,
+    TodayOut,
+)
+from app.schemas.user import SessionRequest, UserOut
+
+__all__ = [
+    "AIClarifyQuestion",
+    "AIClarifyResult",
+    "AICriteriaResult",
+    "AIDay",
+    "AIDayBatch",
+    "AIPhase",
+    "AIRouteSkeleton",
+    "AISimplifiedTask",
+    "ChecklistItemOut",
+    "ChecklistItemUpdate",
+    "ClarifyAnswer",
+    "ClarifyQuestion",
+    "ClarifyRequest",
+    "ClarifyResponse",
+    "CompleteDayOut",
+    "CriteriaUpdate",
+    "CriterionOut",
+    "DailyTaskOut",
+    "GoalCreate",
+    "GoalDetail",
+    "GoalDraftOut",
+    "GoalListItem",
+    "PhaseOut",
+    "SessionRequest",
+    "TodayOut",
+    "TokenUsage",
+    "UserOut",
+]

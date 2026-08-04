@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-ink text-bone font-sans antialiased;
+    /* Телеграм умеет тянуть страницу вниз жестом — на экране со списком
+       дней это ловится как случайное закрытие мини-аппа. */
+    overscroll-behavior-y: none;
+  }
+
+  /* Полосу прокрутки прячем: на мобильном её нет, а в отладке она
+     ломает вёрстку шкалы на пару пикселей. */
+  ::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+  }
+
+  button {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+@layer components {
+  /* Метка капсом с трекингом — встречается на каждом экране. */
+  .label {
+    @apply font-mono text-[10px] uppercase tracking-label text-muted;
+  }
+
+  .label-dim {
+    @apply font-mono text-[9.5px] uppercase tracking-meta text-dim;
+  }
+
+  /* Единственная заливка на экране. */
+  .btn-primary {
+    @apply flex h-[50px] w-full items-center justify-center gap-2 rounded-[14px]
+           bg-bone text-[15px] font-semibold text-ink transition-opacity
+           active:opacity-80 disabled:opacity-40;
+  }
+
+  .btn-ghost {
+    @apply flex h-[50px] w-full items-center justify-center gap-2 rounded-[14px]
+           border border-line text-[14px] font-medium text-muted transition-colors
+           active:border-muted;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
