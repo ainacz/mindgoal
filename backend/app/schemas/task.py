@@ -25,6 +25,8 @@ class CompleteDayRequest(BaseModel):
     Отдельного «сохранить» нет намеренно: человек записывает итог,
     когда день закончен, а не в процессе. Цена решения — если закрыть
     приложение, не нажав «Завершить день», набранное пропадёт.
+
+    Приходит только с тех дней, у которых есть result_prompt.
     """
 
     result_note: str | None = None
@@ -37,6 +39,7 @@ class DailyTaskOut(ORMModel):
     estimated_minutes: int
     description: str
     hint: str | None
+    result_prompt: str | None
     result_note: str | None
     is_completed: bool
     completed_at: datetime | None

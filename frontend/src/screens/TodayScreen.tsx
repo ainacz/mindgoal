@@ -71,19 +71,23 @@ export function TodayScreen({
 
             <Checklist items={task.checklist} onToggle={onToggleChecklistItem} />
 
-            {/* Приложение просит записать результат — значит должно дать куда.
-                Иначе человек уходит в заметки, и мы теряем единственные
-                живые данные о нём: их же читает генератор следующих дней. */}
-            <label className="mt-6 block">
-              <span className="text-[12.5px] text-muted">Что вышло</span>
-              <input
-                value={note}
-                onChange={(event) => setNote(event.target.value)}
-                placeholder="Время, вес, километры, ссылка"
-                maxLength={200}
-                className="mt-2 w-full border-b border-line bg-transparent pb-2 text-[14px] text-bone outline-none placeholder:text-dim focus:border-bone"
-              />
-            </label>
+            {/* Поле есть только там, где у дня есть число: вес, время,
+                ссылка. Вопрос задаёт сам день — на «что вышло» человек
+                пишет «нормально», на «вес и повторения» пишет вес.
+                Эти записи читает генератор следующих дней. */}
+            {task.result_prompt && (
+              <label className="mt-6 block">
+                <span className="text-[12.5px] text-muted">
+                  {task.result_prompt}
+                </span>
+                <input
+                  value={note}
+                  onChange={(event) => setNote(event.target.value)}
+                  maxLength={200}
+                  className="mt-2 w-full border-b border-line bg-transparent pb-2 text-[14px] text-bone outline-none focus:border-bone"
+                />
+              </label>
+            )}
 
             {task.hint && <Hint text={task.hint} />}
           </div>

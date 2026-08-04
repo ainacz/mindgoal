@@ -24,6 +24,8 @@ export interface DailyTask {
   estimated_minutes: number;
   description: string;
   hint: string | null;
+  // null — у дня нет измеримого итога, поле записи не показывается.
+  result_prompt: string | null;
   result_note: string | null;
   is_completed: boolean;
   completed_at: string | null;

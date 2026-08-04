@@ -89,6 +89,12 @@ class AIDay(StrictModel):
     hint: str | None = Field(default=None, max_length=400)
     checklist: list[str] = Field(min_length=1, max_length=5)
 
+    # О чём спросить по итогу дня, в терминах самого дня: «Вес и повторения»,
+    # «Время и дистанция». null — записывать нечего, поле на экране не
+    # появляется. Универсальное «что вышло» просить бесполезно: человек
+    # не понимает, что от него хотят, и пишет «нормально».
+    result_prompt: str | None = Field(default=None, max_length=60)
+
 
 class AIRouteSkeleton(StrictModel):
     """Первый вызов генерации: фазы на весь срок и первая неделя дней."""

@@ -188,7 +188,10 @@ export default function App() {
             </p>
             {openedDay.result_note && (
               <p className="mt-4 text-[13.5px] leading-relaxed text-bone">
-                <span className="text-muted">Вышло:</span> {openedDay.result_note}
+                <span className="text-muted">
+                  {openedDay.result_prompt ?? "Вышло"}:
+                </span>{" "}
+                {openedDay.result_note}
               </p>
             )}
             <ul className="mt-5 border-t border-line-soft">

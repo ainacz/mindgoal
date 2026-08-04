@@ -135,6 +135,7 @@ def _build_task(goal_id: uuid.UUID, day: AIDay) -> DailyTask:
         estimated_minutes=day.estimated_minutes,
         description=day.description,
         hint=day.hint,
+        result_prompt=day.result_prompt,
     )
     task.checklist = [
         TaskChecklistItem(text=text, order_index=index)

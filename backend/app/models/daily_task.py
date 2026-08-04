@@ -46,9 +46,13 @@ class DailyTask(Base):
     description: Mapped[str] = mapped_column(Text, nullable=False)
     hint: Mapped[str | None] = mapped_column(Text)
 
-    # Что человек записал по итогу дня: время, вес, километры, ссылка.
-    # Единственные живые данные о нём — их же читает генератор
-    # следующих дней, иначе маршрут строится вслепую.
+    # О чём спросить по итогу дня («Вес и повторения», «Время и дистанция»).
+    # Пишет модель вместе с самим днём. null — записывать нечего,
+    # поля на экране нет: установочный день не даёт числа.
+    result_prompt: Mapped[str | None] = mapped_column(String(60))
+
+    # Что человек записал в ответ. Единственные живые данные о нём —
+    # их же читает генератор следующих дней, иначе маршрут строится вслепую.
     result_note: Mapped[str | None] = mapped_column(Text)
 
     is_completed: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
