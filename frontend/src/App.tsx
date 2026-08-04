@@ -92,7 +92,10 @@ export default function App() {
   );
 
   return (
-    <div className="relative mx-auto flex h-full max-w-[430px] flex-col overflow-hidden bg-ink">
+    // 100dvh, а не h-full: в вебвью Telegram высота body не наследуется
+    // от html, колонка схлопывается по контенту — и таббар уезжает вверх
+    // на коротких экранах вроде «Карты».
+    <div className="relative mx-auto flex h-[100dvh] max-w-[430px] flex-col overflow-hidden bg-ink">
       {tab === "today" &&
         (today.data && goal.data ? (
           <TodayScreen

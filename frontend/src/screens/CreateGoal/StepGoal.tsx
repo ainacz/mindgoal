@@ -5,6 +5,7 @@ interface Props {
   title: string;
   duration: number;
   busy: boolean;
+  error: string | null;
   onTitleChange: (value: string) => void;
   onDurationChange: (value: number) => void;
   onNext: () => void;
@@ -16,6 +17,7 @@ export function StepGoal({
   title,
   duration,
   busy,
+  error,
   onTitleChange,
   onDurationChange,
   onNext,
@@ -35,7 +37,7 @@ export function StepGoal({
         <input
           value={title}
           onChange={(event) => onTitleChange(event.target.value)}
-          placeholder="Стать AI-инженером"
+          placeholder="Накопить на ноутбук"
           maxLength={200}
           autoComplete="off"
           className="w-full bg-transparent font-display text-[21px] font-light text-bone outline-none placeholder:text-dim"
@@ -88,6 +90,12 @@ export function StepGoal({
       >
         {busy ? "Смотрю цель…" : "Дальше"}
       </button>
+
+      {error && (
+        <p className="mt-3 text-center text-[13px] leading-relaxed text-danger">
+          {error}
+        </p>
+      )}
 
       <p className="mt-3.5 text-center label-dim leading-relaxed">
         Дни ждут тебя, а не наоборот —

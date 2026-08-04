@@ -38,6 +38,7 @@ export function CreateGoalSheet({ open, api, onClose, onFinished }: Props) {
   const [stage, setStage] = useState<Stage>("goal");
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const [title, setTitle] = useState("");
   const [duration, setDuration] = useState(90);
@@ -56,6 +57,7 @@ export function CreateGoalSheet({ open, api, onClose, onFinished }: Props) {
     setStage("goal");
     setBusy(false);
     setFailed(false);
+    setError(null);
     setTitle("");
     setDuration(90);
     setQuestions([]);
@@ -74,6 +76,10 @@ export function CreateGoalSheet({ open, api, onClose, onFinished }: Props) {
       setGoalId(created.goal.id);
       setCriteria(created.criteria.map((item) => item.text));
       setStage("criteria");
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Не получилось. Попробуй ещё раз.",
+      );
     } finally {
       setBusy(false);
     }
@@ -81,6 +87,7 @@ export function CreateGoalSheet({ open, api, onClose, onFinished }: Props) {
 
   async function handleFirstStep() {
     setBusy(true);
+    setError(null);
     try {
       const asked = await api.clarify(title.trim(), duration);
       if (asked.length === 0) {
@@ -89,6 +96,12 @@ export function CreateGoalSheet({ open, api, onClose, onFinished }: Props) {
       }
       setQuestions(asked);
       setStage("questions");
+    } catch (err) {
+      // Молчаливая кнопка — худшее, что может случиться в мастере:
+      // человек жмёт и не понимает, сломалось или думает.
+      setError(
+        err instanceof Error ? err.message : "Не получилось. Попробуй ещё раз.",
+      );
     } finally {
       setBusy(false);
     }
@@ -144,6 +157,7 @@ export function CreateGoalSheet({ open, api, onClose, onFinished }: Props) {
           title={title}
           duration={duration}
           busy={busy}
+          error={error}
           onTitleChange={setTitle}
           onDurationChange={setDuration}
           onNext={() => void handleFirstStep()}
