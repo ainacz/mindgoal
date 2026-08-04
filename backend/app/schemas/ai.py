@@ -36,6 +36,11 @@ class AICriteriaResult(StrictModel):
     category: str = Field(min_length=2, max_length=40)
     criteria: list[str] = Field(min_length=3, max_length=4)
 
+    # Заполняется, только когда срок не бьётся с уровнем. Не блокирует
+    # создание цели: человек вправе взяться за невозможное, но должен
+    # узнать об этом до, а не на тридцатый день.
+    reality_note: str | None = Field(default=None, max_length=250)
+
     @field_validator("criteria")
     @classmethod
     def _measurable(cls, values: list[str]) -> list[str]:

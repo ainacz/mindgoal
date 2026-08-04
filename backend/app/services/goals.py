@@ -67,7 +67,7 @@ async def create_goal(
     *,
     user: User,
     payload: GoalCreate,
-) -> Goal:
+) -> tuple[Goal, str | None]:
     """Заводит цель в статусе draft вместе с критериями.
 
     Маршрута ещё нет: человек сначала смотрит критерии и правит их,
@@ -105,7 +105,7 @@ async def create_goal(
         usage=result.usage,
         latency_ms=result.latency_ms,
     )
-    return goal
+    return goal, result.data.reality_note
 
 
 async def replace_criteria(
@@ -242,6 +242,16 @@ async def ensure_days(
         .order_by(DailyTask.day_number)
     )
 
+    # Последние три записи, а не все: старые перестают быть правдой,
+    # а вход платный.
+    recent = await session.execute(
+        select(DailyTask.day_number, DailyTask.result_note)
+        .where(DailyTask.goal_id == goal.id, DailyTask.result_note.is_not(None))
+        .order_by(DailyTask.day_number.desc())
+        .limit(3)
+    )
+    recent_results = [(day, note) for day, note in reversed(recent.all())]
+
     result = await make_batch(
         client,
         settings,
@@ -250,6 +260,7 @@ async def ensure_days(
         criteria=[c.text for c in goal.criteria],
         current_phase=phase.title if phase else "",
         written_titles=list(written),
+        recent_results=recent_results,
         first_day=first,
         last_day=last,
     )

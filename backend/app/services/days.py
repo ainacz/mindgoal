@@ -96,6 +96,7 @@ async def complete_day(
     user: User,
     goal: Goal,
     task: DailyTask,
+    result_note: str | None = None,
 ) -> CompleteDayOut:
     """Завершить текущий день.
 
@@ -111,6 +112,8 @@ async def complete_day(
 
     task.is_completed = True
     task.completed_at = datetime.now(timezone.utc)
+    if result_note and result_note.strip():
+        task.result_note = result_note.strip()[:1000]
 
     today = local_today(user.tz_offset_minutes)
     goal.streak_days = next_streak(goal.last_completed_date, goal.streak_days, today)

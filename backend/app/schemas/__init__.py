@@ -29,6 +29,7 @@ from app.schemas.task import (
     ChecklistItemOut,
     ChecklistItemUpdate,
     CompleteDayOut,
+    CompleteDayRequest,
     DailyTaskOut,
     TodayOut,
 )
@@ -50,6 +51,7 @@ __all__ = [
     "ClarifyRequest",
     "ClarifyResponse",
     "CompleteDayOut",
+    "CompleteDayRequest",
     "CriteriaUpdate",
     "CriterionOut",
     "DailyTaskOut",

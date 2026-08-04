@@ -46,6 +46,11 @@ class DailyTask(Base):
     description: Mapped[str] = mapped_column(Text, nullable=False)
     hint: Mapped[str | None] = mapped_column(Text)
 
+    # Что человек записал по итогу дня: время, вес, километры, ссылка.
+    # Единственные живые данные о нём — их же читает генератор
+    # следующих дней, иначе маршрут строится вслепую.
+    result_note: Mapped[str | None] = mapped_column(Text)
+
     is_completed: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 

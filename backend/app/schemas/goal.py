@@ -130,3 +130,6 @@ class GoalDraftOut(ORMModel):
 
     goal: GoalListItem
     criteria: list[CriterionOut]
+    # Не null, когда срок не бьётся с уровнем. Показывается один раз,
+    # в мастере, и в базе не хранится.
+    reality_note: str | None = None

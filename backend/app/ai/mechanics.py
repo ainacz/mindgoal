@@ -96,6 +96,7 @@ async def make_batch(
     criteria: list[str],
     current_phase: str,
     written_titles: list[str],
+    recent_results: list[tuple[int, str]],
     first_day: int,
     last_day: int,
 ) -> Structured[AIDayBatch]:
@@ -111,6 +112,7 @@ async def make_batch(
             criteria,
             current_phase,
             written_titles,
+            recent_results,
             first_day,
             last_day,
         ),

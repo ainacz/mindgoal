@@ -19,6 +19,17 @@ class ChecklistItemUpdate(BaseModel):
     is_done: bool
 
 
+class CompleteDayRequest(BaseModel):
+    """Запись результата едет вместе с завершением дня.
+
+    Отдельного «сохранить» нет намеренно: человек записывает итог,
+    когда день закончен, а не в процессе. Цена решения — если закрыть
+    приложение, не нажав «Завершить день», набранное пропадёт.
+    """
+
+    result_note: str | None = None
+
+
 class DailyTaskOut(ORMModel):
     id: uuid.UUID
     day_number: int
@@ -26,6 +37,7 @@ class DailyTaskOut(ORMModel):
     estimated_minutes: int
     description: str
     hint: str | None
+    result_note: str | None
     is_completed: bool
     completed_at: datetime | None
     is_simplified: bool

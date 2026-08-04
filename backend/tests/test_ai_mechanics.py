@@ -213,6 +213,7 @@ def test_batch_gets_written_titles_but_not_descriptions():
             criteria=["Задеплоен сервис"],
             current_phase="База Python и API",
             written_titles=["Поставить Python", "Написать первый скрипт"],
+            recent_results=[(7, "Пробежал 5 км за 31 минуту")],
             first_day=8,
             last_day=14,
         )
@@ -220,6 +221,9 @@ def test_batch_gets_written_titles_but_not_descriptions():
     user_message = fake.calls[0][1]["content"]
     assert "Поставить Python" in user_message
     assert "Конкретное действие" not in user_message
+    # Записи человека доходят целиком: без них маршрут строится по плану,
+    # а не по тому, что вышло на самом деле.
+    assert "Пробежал 5 км за 31 минуту" in user_message
     assert fake.system_prompts == [SYSTEM_BATCH]
 
 
@@ -300,6 +304,7 @@ def test_stub_writes_any_requested_batch():
             criteria=["Опубликован результат"],
             current_phase="Практика и объём",
             written_titles=["Поставить всё нужное"],
+            recent_results=[],
             first_day=84,
             last_day=90,
         )

@@ -25,6 +25,7 @@ from app.schemas.task import (
     ChecklistItemOut,
     ChecklistItemUpdate,
     CompleteDayOut,
+    CompleteDayRequest,
     TodayOut,
 )
 from app.schemas.user import SessionRequest, UserOut
@@ -87,13 +88,14 @@ async def create_goal(
     settings: SettingsDep,
     user: UserDep,
 ) -> GoalDraftOut:
-    goal = await goals_service.create_goal(
+    goal, reality_note = await goals_service.create_goal(
         session, client, settings, user=user, payload=payload
     )
     await session.commit()
     return GoalDraftOut(
         goal=GoalListItem.model_validate(goal),
         criteria=[CriterionOut.model_validate(c) for c in goal.criteria],
+        reality_note=reality_note,
     )
 
 
@@ -198,6 +200,7 @@ async def today(
 @router.post("/tasks/{task_id}/complete", response_model=CompleteDayOut)
 async def complete(
     task_id: uuid.UUID,
+    payload: CompleteDayRequest,
     session: SessionDep,
     settings: SettingsDep,
     user: UserDep,
@@ -209,7 +212,12 @@ async def complete(
 
     try:
         result = await complete_day(
-            session, settings, user=user, goal=goal, task=task
+            session,
+            settings,
+            user=user,
+            goal=goal,
+            task=task,
+            result_note=payload.result_note,
         )
     except DayError as exc:
         raise HTTPException(status.HTTP_409_CONFLICT, str(exc)) from exc
